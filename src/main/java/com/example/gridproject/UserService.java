@@ -11,18 +11,18 @@ import java.util.List;
 public class UserService {
 
     private final RestTemplate restTemplate = new RestTemplate();
-    private final String API_URL = "https://dummyjson.com/users";
 
-    public List<User> fetchUsers() {
+    public List<User> fetchUsers(int offset, int limit) {
+        String API_URL = "https://dummyjson.com/users?skip=" + offset + "&limit=" + limit;
         ResponseEntity<UserResponse> response = restTemplate.getForEntity(API_URL, UserResponse.class);
-        UserResponse body = response.getBody();
 
-        // Protect against null responses
-        if (body != null && body.getUsers() != null) {
-            return body.getUsers();
-        }
+        return response.getBody() != null ? response.getBody().getUsers() : Collections.emptyList();
+    }
 
-        return Collections.emptyList(); // return empty list if null
+    public int fetchUserCount() {
+        ResponseEntity<UserResponse> response = restTemplate.getForEntity("https://dummyjson.com/users", UserResponse.class);
+        return response.getBody() != null ? response.getBody().getTotal() : 0;
     }
 }
+
 
